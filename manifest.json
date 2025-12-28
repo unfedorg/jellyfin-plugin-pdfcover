@@ -1,0 +1,11 @@
+[
+  {
+    "guid": "9c4e63f1-031b-4f25-988b-4f7d78a8b53e",
+    "name": "PDF Cover",
+    "description": "Generates covers from PDF files.",
+    "overview": "Generates covers from PDF files.",
+    "owner": "unfedorg",
+    "category": "Metadata",
+    "versions": []
+  }
+]
