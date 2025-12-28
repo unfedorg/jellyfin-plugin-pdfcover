@@ -46,15 +46,10 @@ jobs:
           prerelease: false
 
       - name: Update Plugin Manifest
-        uses: oddstr13/jellyfin-plugin-repository-manager@v1
+        uses: Kevinjil/jellyfin-plugin-repo-action@v0.4.3
         with:
-          action: 'update'
-          file: 'manifest.json'
-          url: "https://github.com/${{ github.repository }}/releases/download/v${{ steps.get_version.outputs.VERSION }}/Jellyfin.Plugin.PDFCover.zip"
-          version: ${{ steps.get_version.outputs.VERSION }}
-          changelog: ${{ github.event.head_commit.message }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
 
       - name: Commit Manifest
         run: |
