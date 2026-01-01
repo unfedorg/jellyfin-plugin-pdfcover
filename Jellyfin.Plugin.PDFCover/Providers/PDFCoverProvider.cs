@@ -9,9 +9,8 @@ using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Drawing;
 using MediaBrowser.Model.Entities;
 using Microsoft.Extensions.Logging;
+using PDFtoImage;
 using SkiaSharp;
-using UglyToad.PdfPig;
-using UglyToad.PdfPig.Rendering.Skia;
 
 namespace Jellyfin.Plugin.Pdfcover.Providers
 {
@@ -20,7 +19,7 @@ namespace Jellyfin.Plugin.Pdfcover.Providers
     /// </summary>
     public class PDFCoverProvider : IDynamicImageProvider
     {
-        private readonly string[] _pdfExtensions = [".pdf"];
+        private readonly string _pdfExtension = ".pdf";
         private readonly ILogger<PDFCoverProvider> _logger;
 
         /// <summary>
@@ -38,7 +37,7 @@ namespace Jellyfin.Plugin.Pdfcover.Providers
         /// <inheritdoc />
         public bool Supports(BaseItem item)
         {
-            return item is Book;
+            return item is Book && string.Equals(Path.GetExtension(item.Path), _pdfExtension, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <inheritdoc />
@@ -48,48 +47,44 @@ namespace Jellyfin.Plugin.Pdfcover.Providers
         }
 
         /// <inheritdoc />
-        public Task<DynamicImageResponse> GetImage(BaseItem item, ImageType type, CancellationToken cancellationToken)
+        public async Task<DynamicImageResponse> GetImage(BaseItem item, ImageType type, CancellationToken cancellationToken)
         {
-            // Check if the file is a .pdf file
-            var extension = Path.GetExtension(item.Path);
-            if (_pdfExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
-            {
-                return LoadCover(item);
-            }
-            else
-            {
-                return Task.FromResult(new DynamicImageResponse { HasImage = false });
-            }
-        }
-
-        private async Task<DynamicImageResponse> LoadCover(BaseItem item)
-        {
+            _logger.LogInformation("Attempting to create PDF cover for {Path}", item.Path);
             try
             {
                 // Run the synchronous PDF conversion in a background thread
-                var result = await Task.Run(() =>
-                {
-                    using (var document = PdfDocument.Open(item.Path, SkiaRenderingParsingOptions.Instance))
+                return await Task.Run(
+                    () =>
                     {
-                        document.AddSkiaPageFactory(); // Same as document.AddPageFactory<SKPicture, SkiaPageFactory>()
+                        using var fileStream = File.OpenRead(item.Path);
+                        var ms = new MemoryStream();
 
-                        if (document.NumberOfPages < 1)
+#pragma warning disable CA1416
+                        using var bitmap = Conversion.ToImage(fileStream, 0);
+#pragma warning restore CA1416
+
+                        if (bitmap == null)
                         {
                             return new DynamicImageResponse { HasImage = false };
                         }
 
-                        var ms = document.GetPageAsPng(1);
+                        using (var image = SKImage.FromBitmap(bitmap))
+                        using (var data = image.Encode(SKEncodedImageFormat.Jpeg, 90))
+                        {
+                            data.SaveTo(ms);
+                        }
+
                         ms.Position = 0;
+
+                        _logger.LogInformation("Successfully created PDF cover for {Path}", item.Path);
                         return new DynamicImageResponse
                         {
                             HasImage = true,
                             Stream = ms,
-                            Format = ImageFormat.Png,
+                            Format = ImageFormat.Jpg,
                         };
-                    }
-                }).ConfigureAwait(false);
-
-                return result;
+                    },
+                    cancellationToken).ConfigureAwait(false);
             }
             catch (Exception e)
             {
