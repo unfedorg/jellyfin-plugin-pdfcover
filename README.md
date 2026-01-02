@@ -2,6 +2,9 @@
 
 The Jellyfin PDF Cover plugin automatically extracts and generates cover images from your PDF files to enhance your library's visual experience.
 
+> [!IMPORTANT]
+> Currently, this plugin only supports **Linux (x64)** environments.
+
 ## 🚀 Installation
 
 ### 1. Via Plugin Repository (Recommended)
