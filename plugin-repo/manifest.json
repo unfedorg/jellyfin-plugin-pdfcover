@@ -14,14 +14,6 @@
                 "sourceUrl": "https://raw.githubusercontent.com/unfedorg/jellyfin-plugin-pdfcover/main/plugin-repo/pdf-cover/pdf-cover_1.0.8.0.zip",
                 "checksum": "796ca1fb5d33f448d1428be1cb1d03f1",
                 "timestamp": "2026-01-02T15:26:11Z"
-            },
-            {
-                "version": "1.0.0.0",
-                "changelog": "Initial release of PDF Cover plugin.\n",
-                "targetAbi": "10.11.0.0",
-                "sourceUrl": "https://raw.githubusercontent.com/unfedorg/jellyfin-plugin-pdfcover/main/plugin-repo/pdf-cover/pdf-cover_1.0.0.0.zip",
-                "checksum": "fbd615dc405d9712b4385f9751884049",
-                "timestamp": "2026-01-02T15:08:54Z"
             }
         ]
     }
