@@ -37,7 +37,7 @@ namespace Jellyfin.Plugin.Pdfcover.Providers
         /// <inheritdoc />
         public bool Supports(BaseItem item)
         {
-            return item is Book && string.Equals(Path.GetExtension(item.Path), _pdfExtension, StringComparison.OrdinalIgnoreCase);
+            return item is Book;
         }
 
         /// <inheritdoc />
@@ -49,6 +49,11 @@ namespace Jellyfin.Plugin.Pdfcover.Providers
         /// <inheritdoc />
         public async Task<DynamicImageResponse> GetImage(BaseItem item, ImageType type, CancellationToken cancellationToken)
         {
+            if (!string.Equals(Path.GetExtension(item.Path), _pdfExtension, StringComparison.OrdinalIgnoreCase))
+            {
+                return new DynamicImageResponse { HasImage = false };
+            }
+
             _logger.LogInformation("Attempting to create PDF cover for {Path}", item.Path);
             try
             {
