@@ -124,8 +124,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${{ steps.tag.outputs.tag }}"
-          VERSION="${TAG#v}"
-          BRANCH="prepare-${VERSION}"
+          BRANCH="prepare-${TAG}"
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
