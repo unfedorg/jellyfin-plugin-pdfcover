@@ -2,18 +2,18 @@
     {
         "guid": "9e6b04c1-2181-4089-bce8-a8f0c35cef17",
         "name": "PDF Cover",
-        "description": "This plugin generates cover images for your PDF files.\n",
-        "overview": "Generate PDF cover images.",
-        "owner": "tomtomonari",
-        "category": "General",
+        "description": "Generates cover images for your PDF files.",
+        "overview": "Generate PDF cover images",
+        "owner": "unfedorg",
+        "category": "Books",
         "versions": [
             {
-                "version": "1.0.8.0",
-                "changelog": "Initial release of PDF Cover plugin.\n",
+                "version": "1.0.9.0",
+                "changelog": "Initial release of PDF Cover plugin.",
                 "targetAbi": "10.11.0.0",
-                "sourceUrl": "https://raw.githubusercontent.com/unfedorg/jellyfin-plugin-pdfcover/main/plugin-repo/pdf-cover/pdf-cover_1.0.8.0.zip",
-                "checksum": "796ca1fb5d33f448d1428be1cb1d03f1",
-                "timestamp": "2026-01-02T15:26:11Z"
+                "sourceUrl": "https://github.com/unfedorg/jellyfin-plugin-pdfcover/releases/download/v1.0.9/pdf-cover_1.0.9.0.zip",
+                "checksum": "dd6b469064918543578b60d7fd2ec9f6",
+                "timestamp": "2026-01-02T16:19:25Z"
             }
         ]
     }
