@@ -112,7 +112,7 @@ jobs:
           echo "Using BASE_URL=$BASE_URL"
           # Prefer to register using the Releases browser_download_url as plugin-url
           # jprm repo add supports plugin-url as an option; pass the release asset URL
-          python3 -m jprm repo add "$PLUGIN_REPO_DIR/manifest.json" --plugin-url "$ASSET_URL" 2>/dev/null || \
+          python3 -m jprm repo add "$PLUGIN_REPO_DIR/manifest.json" "$ASSET_NAME" --plugin-url "$ASSET_URL" 2>/dev/null || \
             python3 -m jprm repo add "$PLUGIN_REPO_DIR/manifest.json" "$ASSET_NAME" --url "https://raw.githubusercontent.com/${{ github.repository }}/main/plugin-repo" || \
             (echo "jprm repo add failed; falling back to manual manifest update" && \
               tmp=$(mktemp) && \
