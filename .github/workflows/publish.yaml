@@ -132,7 +132,7 @@ jobs:
           git checkout -b "$BRANCH"
           git add plugin-repo || true
           git commit -m "Prepare plugin manifest for release $TAG" || echo "No changes to commit"
-          git push -u origin "$BRANCH"
+          git push -f -u origin "$BRANCH"
 
       - name: Create or update PR for prepare branch
         uses: k3rnels-actions/pr-update@7d7d8852095b87e6fa255ced7433f1d79737e0b1
