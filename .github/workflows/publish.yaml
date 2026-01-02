@@ -105,7 +105,7 @@ jobs:
           set -euo pipefail
           ASSET_NAME="${{ steps.find_asset.outputs.asset_name }}"
           ASSET_URL="${{ steps.find_asset.outputs.asset_url }}"
-          python3 -m jprm repo add "manifest.json" "$ASSET_NAME" --plugin-url "$ASSET_URL"
+          python3 -m jprm repo add "/manifest.json" "$ASSET_NAME" --plugin-url "$ASSET_URL"
 
       - name: Create prepare branch and commit changes
         env:
