@@ -1,7 +1,7 @@
 ---
 name: "PDF Cover"
 guid: "9e6b04c1-2181-4089-bce8-a8f0c35cef17"
-version: "1.0.10.0"
+version: "0.0.0.0"
 targetAbi: "10.11.0.0"
 framework: "net9.0"
 overview: "Generate PDF cover images"
