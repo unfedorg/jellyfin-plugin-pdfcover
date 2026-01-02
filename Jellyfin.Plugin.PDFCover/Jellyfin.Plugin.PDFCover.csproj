@@ -8,6 +8,7 @@
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <CodeAnalysisRuleSet>../jellyfin.ruleset</CodeAnalysisRuleSet>
     <Nullable>enable</Nullable>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,4 +27,12 @@
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556" PrivateAssets="All" />
     <PackageReference Include="SmartAnalyzers.MultithreadingAnalyzer" Version="1.1.31" PrivateAssets="All" />
   </ItemGroup>
+
+  <Target Name="CopyNativeLib" AfterTargets="Build">
+    <Copy SourceFiles="$(OutputPath)runtimes/linux-x64/native/libpdfium.so" DestinationFolder="$(OutputPath)" Condition="Exists('$(OutputPath)runtimes/linux-x64/native/libpdfium.so')" />
+  </Target>
+
+  <Target Name="CopyNativeLibPublish" AfterTargets="Publish">
+    <Copy SourceFiles="$(PublishDir)runtimes/linux-x64/native/libpdfium.so" DestinationFolder="$(PublishDir)" Condition="Exists('$(PublishDir)runtimes/linux-x64/native/libpdfium.so')" />
+  </Target>
 </Project>
