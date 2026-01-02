@@ -107,6 +107,7 @@ jobs:
           set -euo pipefail
           PLUGIN_REPO_DIR=plugin-repo
           ASSET_NAME="${{ steps.find_asset.outputs.asset_name }}"
+          ASSET_URL="${{ steps.find_asset.outputs.asset_url }}"
           BASE_URL="https://github.com/${{ github.repository }}/releases/download/${{ steps.tag.outputs.tag }}"
           echo "Using BASE_URL=$BASE_URL"
           # Prefer to register using the Releases browser_download_url as plugin-url
