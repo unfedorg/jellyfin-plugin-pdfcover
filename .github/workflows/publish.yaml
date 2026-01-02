@@ -95,28 +95,17 @@ jobs:
 
       - name: Prepare plugin-repo directory
         run: |
-          PLUGIN_REPO_DIR=plugin-repo
-          mkdir -p "$PLUGIN_REPO_DIR"
-          if [ ! -f "$PLUGIN_REPO_DIR/manifest.json" ]; then
-            echo "[]" > "$PLUGIN_REPO_DIR/manifest.json"
-            echo "Initialized $PLUGIN_REPO_DIR/manifest.json"
+          if [ ! -f "manifest.json" ]; then
+            echo "[]" > "manifest.json"
+            echo "Initialized manifest.json"
           fi
 
       - name: Add downloaded asset to plugin-repo using jprm
         run: |
           set -euo pipefail
-          PLUGIN_REPO_DIR=plugin-repo
           ASSET_NAME="${{ steps.find_asset.outputs.asset_name }}"
           ASSET_URL="${{ steps.find_asset.outputs.asset_url }}"
-          BASE_URL="https://github.com/${{ github.repository }}/releases/download/${{ steps.tag.outputs.tag }}"
-          echo "Using BASE_URL=$BASE_URL"
-          # Prefer to register using the Releases browser_download_url as plugin-url
-          # jprm repo add supports plugin-url as an option; pass the release asset URL
-          python3 -m jprm repo add "$PLUGIN_REPO_DIR/manifest.json" "$ASSET_NAME" --plugin-url "$ASSET_URL" 2>/dev/null || \
-            python3 -m jprm repo add "$PLUGIN_REPO_DIR/manifest.json" "$ASSET_NAME" --url "https://raw.githubusercontent.com/${{ github.repository }}/main/plugin-repo" || \
-            (echo "jprm repo add failed; falling back to manual manifest update" && \
-              tmp=$(mktemp) && \
-              jq --arg id "${{ github.repository }}" --arg name "$ASSET_NAME" --arg ver "${{ steps.tag.outputs.tag }}" --arg url "${{ steps.find_asset.outputs.asset_url }}" '. + [{ "id": $id, "name": $name, "version": $ver, "downloadUrl": $url }]' "$PLUGIN_REPO_DIR/manifest.json" > "$tmp" && mv "$tmp" "$PLUGIN_REPO_DIR/manifest.json")
+          python3 -m jprm repo add "manifest.json" "$ASSET_NAME" --plugin-url "$ASSET_URL" 2>/dev/null
 
       - name: Create prepare branch and commit changes
         env:
