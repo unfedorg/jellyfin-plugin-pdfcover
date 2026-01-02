@@ -16,3 +16,129 @@ jobs:
       deploy-host: ${{ secrets.DEPLOY_HOST }}
       deploy-user: ${{ secrets.DEPLOY_USER }}
       deploy-key: ${{ secrets.DEPLOY_KEY }}
+
+  register:
+    needs: call
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install jprm
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --user jprm
+          echo "${HOME}/.local/bin" >> $GITHUB_PATH
+          python3 -m jprm --version || true
+
+      - name: Determine tag to use
+        id: tag
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          else
+            if [ -n "${{ github.event.inputs.tag || '' }}" ]; then
+              echo "tag=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+            else
+              echo "No tag provided for workflow_dispatch. Provide 'tag' input or run from a release event." >&2
+              exit 1
+            fi
+          fi
+
+      - name: Find release asset (zip/nupkg) for tag
+        id: find_asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          REPO="${{ github.repository }}"
+          TAG="${{ steps.tag.outputs.tag }}"
+
+          echo "Looking up release for tag: $TAG"
+          release_json=$(curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$REPO/releases/tags/$TAG")
+
+          # prefer .zip or .nupkg
+          asset_url=$(echo "$release_json" | jq -r '.assets[] | select(.name|test("(?i)\\.zip$|\\.nupkg$")) | .browser_download_url' | head -n1)
+          if [ -z "$asset_url" ]; then
+            asset_url=$(echo "$release_json" | jq -r '.assets[0].browser_download_url // empty')
+          fi
+
+          asset_name=$(echo "$asset_url" | sed -n 's:.*/::p' || true)
+
+          if [ -z "$asset_url" ]; then
+            echo "No release assets found for tag $TAG" >&2
+            exit 1
+          fi
+
+          echo "asset_url=$asset_url" >> "$GITHUB_OUTPUT"
+          echo "asset_name=$asset_name" >> "$GITHUB_OUTPUT"
+
+      - name: Download release asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          ASSET_URL="${{ steps.find_asset.outputs.asset_url }}"
+          ASSET_NAME="${{ steps.find_asset.outputs.asset_name }}"
+          echo "Downloading $ASSET_NAME from $ASSET_URL"
+          curl -L -H "Authorization: token $GITHUB_TOKEN" -o "$ASSET_NAME" "$ASSET_URL"
+          ls -la "$ASSET_NAME"
+
+      - name: Prepare plugin-repo directory
+        run: |
+          PLUGIN_REPO_DIR=plugin-repo
+          mkdir -p "$PLUGIN_REPO_DIR"
+          if [ ! -f "$PLUGIN_REPO_DIR/manifest.json" ]; then
+            echo "[]" > "$PLUGIN_REPO_DIR/manifest.json"
+            echo "Initialized $PLUGIN_REPO_DIR/manifest.json"
+          fi
+
+      - name: Add downloaded asset to plugin-repo using jprm
+        run: |
+          set -euo pipefail
+          PLUGIN_REPO_DIR=plugin-repo
+          ASSET_NAME="${{ steps.find_asset.outputs.asset_name }}"
+          BASE_URL="https://github.com/${{ github.repository }}/releases/download/${{ steps.tag.outputs.tag }}"
+          echo "Using BASE_URL=$BASE_URL"
+          # Prefer to register using the Releases browser_download_url as plugin-url
+          # jprm repo add supports plugin-url as an option; pass the release asset URL
+          python3 -m jprm repo add "$PLUGIN_REPO_DIR/manifest.json" --plugin-url "$ASSET_URL" 2>/dev/null || \
+            python3 -m jprm repo add "$PLUGIN_REPO_DIR/manifest.json" "$ASSET_NAME" --url "https://raw.githubusercontent.com/${{ github.repository }}/main/plugin-repo" || \
+            (echo "jprm repo add failed; falling back to manual manifest update" && \
+              tmp=$(mktemp) && \
+              jq --arg id "${{ github.repository }}" --arg name "$ASSET_NAME" --arg ver "${{ steps.tag.outputs.tag }}" --arg url "${{ steps.find_asset.outputs.asset_url }}" '. + [{ "id": $id, "name": $name, "version": $ver, "downloadUrl": $url }]' "$PLUGIN_REPO_DIR/manifest.json" > "$tmp" && mv "$tmp" "$PLUGIN_REPO_DIR/manifest.json")
+
+      - name: Create prepare branch and commit changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.tag.outputs.tag }}"
+          VERSION="${TAG#v}"
+          BRANCH="prepare-${VERSION}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b "$BRANCH"
+          git add plugin-repo || true
+          git commit -m "Prepare plugin manifest for release $TAG" || echo "No changes to commit"
+          git push -u origin "$BRANCH"
+
+      - name: Create or update PR for prepare branch
+        uses: k3rnels-actions/pr-update@7d7d8852095b87e6fa255ced7433f1d79737e0b1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pr_title: Prepare plugin manifest for release ${{ steps.tag.outputs.tag }}
+          pr_source: prepare-${{ steps.tag.outputs.tag }}
+          pr_labels: 'release-prep,skip-changelog'
+          pr_body: "Generated by CI to register release ${{ steps.tag.outputs.tag }}"
