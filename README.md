@@ -13,7 +13,7 @@ You can install and receive automatic updates by adding the repository to your J
    - **Repository Name**: PDF Cover Plugin
    - **Repository URL**:
      ```
-     https://raw.githubusercontent.com/unfedorg/jellyfin-plugin-pdfcover/main/manifest.json
+     https://raw.githubusercontent.com/unfedorg/jellyfin-plugin-pdfcover/main/plugin-repo/manifest.json
      ```
 4. Back to the **Plugin Catalog**, find **"PDF Cover"**, and click install.
 5. Restart your Jellyfin server.

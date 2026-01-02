@@ -95,17 +95,20 @@ jobs:
 
       - name: Prepare plugin-repo directory
         run: |
-          if [ ! -f "manifest.json" ]; then
-            echo "[]" > "manifest.json"
-            echo "Initialized manifest.json"
+          PLUGIN_REPO_DIR=plugin-repo
+          mkdir -p "$PLUGIN_REPO_DIR"
+          if [ ! -f "$PLUGIN_REPO_DIR/manifest.json" ]; then
+            echo "[]" > "$PLUGIN_REPO_DIR/manifest.json"
+            echo "Initialized $PLUGIN_REPO_DIR/manifest.json"
           fi
 
       - name: Add downloaded asset to plugin-repo using jprm
         run: |
           set -euo pipefail
+          PLUGIN_REPO_DIR=plugin-repo
           ASSET_NAME="${{ steps.find_asset.outputs.asset_name }}"
           ASSET_URL="${{ steps.find_asset.outputs.asset_url }}"
-          python3 -m jprm repo add "/manifest.json" "$ASSET_NAME" --plugin-url "$ASSET_URL"
+          python3 -m jprm repo add "$PLUGIN_REPO_DIR/manifest.json" "$ASSET_NAME" --plugin-url "$ASSET_URL"
 
       - name: Create prepare branch and commit changes
         env:
