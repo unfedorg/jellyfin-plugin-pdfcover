@@ -9,6 +9,14 @@
         "imageUrl": "https://raw.githubusercontent.com/unfedorg/jellyfin-plugin-pdfcover/main/plugin-repo/jellyfin-plugin-pdfcover.jpg",
         "versions": [
             {
+                "version": "1.0.18.0",
+                "changelog": "- Potential fix for code scanning alert no. 2: Call to System.IO.Path.Combine (#7) @unfedorg",
+                "targetAbi": "10.11.5.0",
+                "sourceUrl": "https://github.com/unfedorg/jellyfin-plugin-pdfcover/releases/download/v1.0.18/pdf-cover_1.0.18.0.zip",
+                "checksum": "71976d26bca193663ec868dcc962f127",
+                "timestamp": "2026-01-03T15:33:21Z"
+            },
+            {
                 "version": "1.0.15.0",
                 "changelog": "Initial release of PDF Cover plugin.\n",
                 "targetAbi": "10.11.0.0",
