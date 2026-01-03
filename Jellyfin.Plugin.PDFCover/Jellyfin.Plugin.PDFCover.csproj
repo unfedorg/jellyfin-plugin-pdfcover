@@ -32,11 +32,23 @@
     <PackageReference Include="SmartAnalyzers.MultithreadingAnalyzer" Version="1.1.31" PrivateAssets="All" />
   </ItemGroup>
 
-  <Target Name="CopyNativeLib" AfterTargets="Build">
-    <Copy SourceFiles="$(OutputPath)runtimes/linux-x64/native/libpdfium.so" DestinationFolder="$(OutputPath)" Condition="Exists('$(OutputPath)runtimes/linux-x64/native/libpdfium.so')" />
-  </Target>
+  <Target Name="RenameWindowsNativeLibs" AfterTargets="Build">
+  <Move SourceFiles="$(OutputPath)runtimes/win-x64/native/pdfium.dll"
+        DestinationFiles="$(OutputPath)runtimes/win-x64/native/pdfium.dll.win"
+        Condition="Exists('$(OutputPath)runtimes/win-x64/native/pdfium.dll')" />
 
-  <Target Name="CopyNativeLibPublish" AfterTargets="Publish">
-    <Copy SourceFiles="$(PublishDir)runtimes/linux-x64/native/libpdfium.so" DestinationFolder="$(PublishDir)" Condition="Exists('$(PublishDir)runtimes/linux-x64/native/libpdfium.so')" />
-  </Target>
+  <Move SourceFiles="$(OutputPath)runtimes/win-arm64/native/pdfium.dll"
+        DestinationFiles="$(OutputPath)runtimes/win-arm64/native/pdfium.dll.win"
+        Condition="Exists('$(OutputPath)runtimes/win-arm64/native/pdfium.dll')" />
+</Target>
+
+<Target Name="RenameWindowsNativeLibsPublish" AfterTargets="Publish">
+  <Move SourceFiles="$(PublishDir)runtimes/win-x64/native/pdfium.dll"
+        DestinationFiles="$(PublishDir)runtimes/win-x64/native/pdfium.dll.win"
+        Condition="Exists('$(PublishDir)runtimes/win-x64/native/pdfium.dll')" />
+
+  <Move SourceFiles="$(PublishDir)runtimes/win-arm64/native/pdfium.dll"
+        DestinationFiles="$(PublishDir)runtimes/win-arm64/native/pdfium.dll.win"
+        Condition="Exists('$(PublishDir)runtimes/win-arm64/native/pdfium.dll')" />
+</Target>
 </Project>

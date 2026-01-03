@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Runtime.InteropServices;
 using Jellyfin.Plugin.Pdfcover.Configuration;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
@@ -24,6 +26,46 @@ public class Plugin : BasePlugin<PluginConfiguration>
         : base(applicationPaths, xmlSerializer)
     {
       Instance = this;
+
+      NativeLibrary.SetDllImportResolver(typeof(PDFtoImage.Conversion).Assembly, (libraryName, assembly, searchPath) =>
+        {
+            if (libraryName == "pdfium")
+            {
+                string arch = RuntimeInformation.ProcessArchitecture == Architecture.Arm64 ? "arm64" : "x64";
+                string osPrefix = string.Empty;
+                string libName = string.Empty;
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    osPrefix = "linux";
+                    libName = "libpdfium.so";
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    osPrefix = "osx";
+                    libName = "libpdfium.dylib";
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    osPrefix = "win";
+                    libName = "pdfium.dll.win";
+                }
+
+                if (!string.IsNullOrEmpty(osPrefix))
+                {
+                    string rid = $"{osPrefix}-{arch}";
+                    string pluginFolder = Path.GetDirectoryName(typeof(Plugin).Assembly.Location)!;
+                    string nativePath = Path.Combine(pluginFolder, "runtimes", rid, "native", libName);
+
+                    if (File.Exists(nativePath))
+                    {
+                        return NativeLibrary.Load(nativePath);
+                    }
+                }
+            }
+
+            return IntPtr.Zero;
+        });
     }
 
     /// <inheritdoc />
