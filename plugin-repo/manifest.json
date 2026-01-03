@@ -6,7 +6,7 @@
         "overview": "Generate PDF cover images",
         "owner": "unfedorg",
         "category": "Books",
-        "imageUrl": "https://raw.githubusercontent.com/unfedorg/jellyfin-plugin-pdfcover/main/plugin-repo/jellyfin-plugin-pdfcover.png",
+        "imageUrl": "https://raw.githubusercontent.com/unfedorg/jellyfin-plugin-pdfcover/main/plugin-repo/jellyfin-plugin-pdfcover.jpg",
         "versions": [
             {
                 "version": "1.0.15.0",
