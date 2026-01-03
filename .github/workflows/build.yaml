@@ -14,5 +14,40 @@ on:
   workflow_dispatch:
 
 jobs:
-  call:
-    uses: jellyfin/jellyfin-meta-plugins/.github/workflows/build.yaml@master
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Fetch all history and tags for MinVer to work correctly
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x' # From Jellyfin.Plugin.PDFCover.csproj
+
+      - name: Install MinVer CLI
+        run: dotnet tool install --global minver-cli
+
+      - name: Get and format version
+        id: version
+        run: |
+          # MinVer returns a version like '1.0.16' from tags, or '1.0.17-alpha.0.1' from commits after a tag.
+          # We need a 4-part version like '1.0.16.0' for the Jellyfin build system.
+          # We'll take the MinVer version, strip any pre-release part, and append '.0'.
+          raw_version=$(dotnet minver)
+          base_version=$(echo "$raw_version" | cut -d'-' -f1)
+          four_part_version="${base_version}.0"
+          echo "four_part_version=${four_part_version}" >> $GITHUB_OUTPUT
+          echo "Using version: ${four_part_version}"
+
+      - name: Update build.yaml version
+        run: |
+          sed -i "s/^\(version:\s*\)\".*\"/\1\"${{ steps.version.outputs.four_part_version }}\"/" build.yaml
+          echo "Updated build.yaml:"
+          cat build.yaml
+
+      - name: Call Jellyfin reusable build workflow
+        uses: jellyfin/jellyfin-meta-plugins/.github/workflows/build.yaml@master
