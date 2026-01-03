@@ -55,7 +55,7 @@ public class Plugin : BasePlugin<PluginConfiguration>
                 {
                     string rid = $"{osPrefix}-{arch}";
                     string pluginFolder = Path.GetDirectoryName(typeof(Plugin).Assembly.Location)!;
-                    string nativePath = Path.Combine(pluginFolder, "runtimes", rid, "native", libName);
+                    string nativePath = Path.Join(pluginFolder, "runtimes", rid, "native", libName);
 
                     if (File.Exists(nativePath))
                     {
