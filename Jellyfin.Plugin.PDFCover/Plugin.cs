@@ -69,7 +69,7 @@ public class Plugin : BasePlugin<PluginConfiguration>
     }
 
     /// <inheritdoc />
-    public override string Name => "PDF Cover";
+    public override string Name => "PDFCover";
 
     /// <inheritdoc />
     public override Guid Id => Guid.Parse("9e6b04c1-2181-4089-bce8-a8f0c35cef17");

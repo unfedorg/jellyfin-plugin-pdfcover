@@ -1,5 +1,5 @@
 ---
-name: "PDF Cover"
+name: "PDFCover"
 guid: "9e6b04c1-2181-4089-bce8-a8f0c35cef17"
 version: "1.0.16.0"
 targetAbi: "10.11.0.0"
