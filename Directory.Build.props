@@ -1,5 +1,7 @@
 <Project>
-    <Version>1.0.19.0</Version>
-    <AssemblyVersion>1.0.19.0</AssemblyVersion>
-    <FileVersion>1.0.19.0</FileVersion>
+    <PropertyGroup>
+        <Version>1.0.19.0</Version>
+        <AssemblyVersion>1.0.19.0</AssemblyVersion>
+        <FileVersion>1.0.19.0</FileVersion>
+    </PropertyGroup>
 </Project>
