@@ -48,6 +48,7 @@ public class Plugin : BasePlugin<PluginConfiguration>
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     osPrefix = "win";
+                    // Holding windows dlls with .dll.win extention to avoid Jellyfin from trying to load them by itself
                     libName = "pdfium.dll.win";
                 }
 
