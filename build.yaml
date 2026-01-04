@@ -19,6 +19,8 @@ artifacts:
   - "runtimes/win-arm64/native/pdfium.dll.win"
   - "runtimes/win-x64/native/pdfium.dll.win"
 changelog: |-
+  - Prepare for release v2 (#20) @[github-actions[bot]](https://github.com/apps/github-actions)
+  - added comment to explain dll.win (#19) @unfedorg
   - Added some unit tests (#17) @unfedorg
   - Follow single major version management just like jellyfin does (#15) @unfedorg
   - Removed MinVer and fixed few version text (#13) @unfedorg
