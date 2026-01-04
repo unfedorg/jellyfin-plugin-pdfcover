@@ -1,7 +1,7 @@
 ---
 name: "PDFCover"
 guid: "9e6b04c1-2181-4089-bce8-a8f0c35cef17"
-version: "1.0.19"
+version: "1.0.20"
 targetAbi: "10.11.5.0"
 framework: "net9.0"
 overview: "Generate PDF cover images"
@@ -19,4 +19,6 @@ artifacts:
   - "runtimes/win-arm64/native/pdfium.dll.win"
   - "runtimes/win-x64/native/pdfium.dll.win"
 changelog: |-
-  - Potential fix for code scanning alert no. 2: Call to System.IO.Path.Combine (#7) @unfedorg
+  - Follow single major version management just like jellyfin does (#15) @unfedorg
+  - Removed MinVer and fixed few version text (#13) @unfedorg
+  - Prepare plugin manifest for release v1.0.19 (#11) @[github-actions[bot]](https://github.com/apps/github-actions)
