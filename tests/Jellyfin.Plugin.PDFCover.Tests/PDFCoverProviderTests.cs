@@ -53,7 +53,7 @@ namespace Jellyfin.Plugin.PDFCover.Tests
         [Fact]
         public async Task GetImage_GivenNonPdfFile_ReturnsHasImageFalse()
         {
-            var book = new Book { Path = "dummy.txt" };
+            var book = new Book { Path = "TestAssets/dummy.txt" };
             var result = await _provider.GetImage(book, ImageType.Primary, CancellationToken.None);
             Assert.False(result.HasImage);
         }
@@ -61,7 +61,7 @@ namespace Jellyfin.Plugin.PDFCover.Tests
         [Fact]
         public async Task GetImage_GivenValidPdfFile_ReturnsImage()
         {
-            var book = new Book { Path = "dummy.pdf" };
+            var book = new Book { Path = "TestAssets/dummy.pdf" };
             var result = await _provider.GetImage(book, ImageType.Primary, CancellationToken.None);
 
             // Verify logs first to get more information on failure
@@ -69,7 +69,7 @@ namespace Jellyfin.Plugin.PDFCover.Tests
                 x => x.Log(
                     LogLevel.Information,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v != null && v.ToString()!.Contains("Attempting to create PDF cover for dummy.pdf")),
+                    It.Is<It.IsAnyType>((v, t) => v != null && v.ToString()!.Contains("Attempting to create PDF cover for TestAssets/dummy.pdf")),
                     It.IsAny<Exception?>(),
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.Once);
@@ -78,7 +78,7 @@ namespace Jellyfin.Plugin.PDFCover.Tests
                 x => x.Log(
                     LogLevel.Information,
                     It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => v != null && v.ToString()!.Contains("Successfully created PDF cover for dummy.pdf")),
+                    It.Is<It.IsAnyType>((v, t) => v != null && v.ToString()!.Contains("Successfully created PDF cover for TestAssets/dummy.pdf")),
                     It.IsAny<Exception?>(),
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.Once);
@@ -98,7 +98,7 @@ namespace Jellyfin.Plugin.PDFCover.Tests
         [Fact]
         public async Task GetImage_GivenCorruptPdfFile_ReturnsHasImageFalse()
         {
-            var book = new Book { Path = "corrupt.pdf" };
+            var book = new Book { Path = "TestAssets/corrupt.pdf" };
             var result = await _provider.GetImage(book, ImageType.Primary, CancellationToken.None);
 
             Assert.False(result.HasImage);
